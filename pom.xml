@@ -26,6 +26,9 @@
         <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
         <jspecify.version>1.0.0</jspecify.version>
 
+        <!-- lombok -->
+        <lombok.version>1.18.42</lombok.version>
+
         <!-- Apache Commons libraries -->
         <commons-codec.version>1.19.0</commons-codec.version>
         <commons-io.version>2.20.0</commons-io.version>
@@ -201,6 +204,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.42</version> <scope>provided</scope>
+            </dependency>
+
             <!-- Apache Commons -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -244,6 +253,11 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
 
         <!-- Enabled Libraries, see <dependencyManagement> for available libraries you can use -->
@@ -398,10 +412,16 @@
                         <proc>full</proc>
                         <annotationProcessorPaths>
                             <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version> </path>
+
+                            <path>
                                 <groupId>info.picocli</groupId>
                                 <artifactId>picocli-codegen</artifactId>
                                 <version>${picocli-codegen.version}</version>
                             </path>
+
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
