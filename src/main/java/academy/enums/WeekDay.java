@@ -1,6 +1,5 @@
 package academy.enums;
 
-
 import lombok.Getter;
 
 @Getter

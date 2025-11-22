@@ -46,21 +46,18 @@ public class NginxLogParser {
     // User-Agent
     private static final String USER_AGENT = "\"[^\"]*\"";
 
-    private static final Pattern LOG_PATTERN = Pattern.compile(
-        "^" +
-            IP + " " +
-            DASH + " " +
-            CLIENT_ID + " " +
-            TIMESTAMP + " " +
-            "\"" + METHOD + " " +
-            RESOURCE + " " +
-            PROTOCOL + "\"" + " " +
-            STATUS + " " +
-            BYTES + " " +
-            REFERRER + " " +
-            USER_AGENT +
-            "$"
-    );
+    private static final Pattern LOG_PATTERN = Pattern.compile("^" + IP
+            + " " + DASH
+            + " " + CLIENT_ID
+            + " " + TIMESTAMP
+            + " " + "\""
+            + METHOD + " " + RESOURCE
+            + " " + PROTOCOL
+            + "\"" + " " + STATUS
+            + " " + BYTES
+            + " " + REFERRER
+            + " " + USER_AGENT
+            + "$");
 
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("d/MMM/yyyy:HH:mm:ss Z", java.util.Locale.ENGLISH);

@@ -37,74 +37,143 @@ public class MarkdownFormatter extends BaseReportFormatter {
 
     private void appendGeneralInfo(StringBuilder sb, LogAnalysisResult result) {
         sb.append(HEADER_GENERAL);
-        sb.append(TABLE_SEPARATOR).append(" Метрика ").append(TABLE_SEPARATOR)
-            .append(" Значение ").append(TABLE_SEPARATOR).append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Метрика ")
+                .append(TABLE_SEPARATOR)
+                .append(" Значение ")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
         sb.append(TABLE_HEADER_GENERAL).append("\n");
 
         String files = String.join(", ", result.files());
-        sb.append(TABLE_SEPARATOR).append(" Файл(-ы) ").append(TABLE_SEPARATOR)
-            .append(CODE_WRAP).append(files).append(CODE_WRAP).append(TABLE_SEPARATOR).append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Файл(-ы) ")
+                .append(TABLE_SEPARATOR)
+                .append(CODE_WRAP)
+                .append(files)
+                .append(CODE_WRAP)
+                .append(TABLE_SEPARATOR)
+                .append("\n");
 
         var min = getMinDate(result);
         var max = getMaxDate(result);
-        sb.append(TABLE_SEPARATOR).append(" Начальная дата ").append(TABLE_SEPARATOR)
-            .append(min != null ? min : "-").append(TABLE_SEPARATOR).append("\n");
-        sb.append(TABLE_SEPARATOR).append(" Конечная дата ").append(TABLE_SEPARATOR)
-            .append(max != null ? max : "-").append(TABLE_SEPARATOR).append("\n");
-        sb.append(TABLE_SEPARATOR).append(" Количество запросов ").append(TABLE_SEPARATOR)
-            .append(formatNumber(result.totalRequestsCount())).append(TABLE_SEPARATOR).append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Начальная дата ")
+                .append(TABLE_SEPARATOR)
+                .append(min != null ? min : "-")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Конечная дата ")
+                .append(TABLE_SEPARATOR)
+                .append(max != null ? max : "-")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Количество запросов ")
+                .append(TABLE_SEPARATOR)
+                .append(formatNumber(result.totalRequestsCount()))
+                .append(TABLE_SEPARATOR)
+                .append("\n");
 
         var stats = result.responseSizeInBytes();
-        sb.append(TABLE_SEPARATOR).append(" Средний размер ответа ").append(TABLE_SEPARATOR)
-            .append(stats.average()).append("b").append(TABLE_SEPARATOR).append("\n");
-        sb.append(TABLE_SEPARATOR).append(" Максимальный размер ответа ").append(TABLE_SEPARATOR)
-            .append(formatNumber((long) stats.max())).append("b").append(TABLE_SEPARATOR).append("\n");
-        sb.append(TABLE_SEPARATOR).append(" 95p размера ответа ").append(TABLE_SEPARATOR)
-            .append(stats.p95()).append("b").append(TABLE_SEPARATOR).append("\n\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Средний размер ответа ")
+                .append(TABLE_SEPARATOR)
+                .append(stats.average())
+                .append("b")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Максимальный размер ответа ")
+                .append(TABLE_SEPARATOR)
+                .append(formatNumber((long) stats.max()))
+                .append("b")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" 95p размера ответа ")
+                .append(TABLE_SEPARATOR)
+                .append(stats.p95())
+                .append("b")
+                .append(TABLE_SEPARATOR)
+                .append("\n\n");
     }
 
     private void appendResources(StringBuilder sb, LogAnalysisResult result) {
         sb.append(HEADER_RESOURCES);
-        sb.append(TABLE_SEPARATOR).append(" Ресурс ").append(TABLE_SEPARATOR)
-            .append(" Количество ").append(TABLE_SEPARATOR).append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Ресурс ")
+                .append(TABLE_SEPARATOR)
+                .append(" Количество ")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
         sb.append(TABLE_HEADER_RESOURCES).append("\n");
 
         for (var r : result.resources()) {
-            sb.append(TABLE_SEPARATOR).append(CODE_WRAP)
-                .append(r.resource()).append(CODE_WRAP).append(TABLE_SEPARATOR)
-                .append(formatNumber(r.totalRequestsCount())).append(TABLE_SEPARATOR).append("\n");
+            sb.append(TABLE_SEPARATOR)
+                    .append(CODE_WRAP)
+                    .append(r.resource())
+                    .append(CODE_WRAP)
+                    .append(TABLE_SEPARATOR)
+                    .append(formatNumber(r.totalRequestsCount()))
+                    .append(TABLE_SEPARATOR)
+                    .append("\n");
         }
         sb.append("\n");
     }
 
     private void appendResponseCodes(StringBuilder sb, LogAnalysisResult result) {
         sb.append(HEADER_RESPONSE_CODES);
-        sb.append(TABLE_SEPARATOR).append(" Код ").append(TABLE_SEPARATOR)
-            .append(" Название ").append(TABLE_SEPARATOR)
-            .append(" Количество ").append(TABLE_SEPARATOR).append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Код ")
+                .append(TABLE_SEPARATOR)
+                .append(" Название ")
+                .append(TABLE_SEPARATOR)
+                .append(" Количество ")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
         sb.append(TABLE_HEADER_RESPONSE_CODES).append("\n");
 
         for (var rc : result.responseCodes()) {
-            sb.append(TABLE_SEPARATOR).append(rc.code()).append(TABLE_SEPARATOR)
-                .append(getHttpStatusName(rc.code())).append(TABLE_SEPARATOR)
-                .append(formatNumber(rc.totalResponsesCount())).append(TABLE_SEPARATOR).append("\n");
+            sb.append(TABLE_SEPARATOR)
+                    .append(rc.code())
+                    .append(TABLE_SEPARATOR)
+                    .append(getHttpStatusName(rc.code()))
+                    .append(TABLE_SEPARATOR)
+                    .append(formatNumber(rc.totalResponsesCount()))
+                    .append(TABLE_SEPARATOR)
+                    .append("\n");
         }
         sb.append("\n");
     }
 
     private void appendDailyDistribution(StringBuilder sb, LogAnalysisResult result) {
         sb.append(HEADER_DAILY);
-        sb.append(TABLE_SEPARATOR).append(" Дата ").append(TABLE_SEPARATOR)
-            .append(" День недели ").append(TABLE_SEPARATOR)
-            .append(" Количество ").append(TABLE_SEPARATOR)
-            .append(" Процент ").append(TABLE_SEPARATOR).append("\n");
+        sb.append(TABLE_SEPARATOR)
+                .append(" Дата ")
+                .append(TABLE_SEPARATOR)
+                .append(" День недели ")
+                .append(TABLE_SEPARATOR)
+                .append(" Количество ")
+                .append(TABLE_SEPARATOR)
+                .append(" Процент ")
+                .append(TABLE_SEPARATOR)
+                .append("\n");
         sb.append(TABLE_HEADER_DAILY).append("\n");
 
         for (var d : result.requestsPerDate()) {
-            sb.append(TABLE_SEPARATOR).append(d.date()).append(TABLE_SEPARATOR)
-                .append(d.weekday()).append(TABLE_SEPARATOR)
-                .append(formatNumber(d.totalRequestsCount())).append(TABLE_SEPARATOR)
-                .append(String.format("%.2f", d.totalRequestsPercentage())).append("%").append(TABLE_SEPARATOR).append("\n");
+            sb.append(TABLE_SEPARATOR)
+                    .append(d.date())
+                    .append(TABLE_SEPARATOR)
+                    .append(d.weekday())
+                    .append(TABLE_SEPARATOR)
+                    .append(formatNumber(d.totalRequestsCount()))
+                    .append(TABLE_SEPARATOR)
+                    .append(String.format("%.2f", d.totalRequestsPercentage()))
+                    .append("%")
+                    .append(TABLE_SEPARATOR)
+                    .append("\n");
         }
         sb.append("\n");
     }

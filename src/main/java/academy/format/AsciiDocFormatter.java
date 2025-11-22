@@ -40,19 +40,24 @@ public class AsciiDocFormatter extends BaseReportFormatter {
         sb.append(HEADER_OPTION_2COLS).append("\n").append(TABLE_START).append("\n");
         sb.append("| Метрика | Значение\n");
 
-        String files = String.join(", ", result.files().stream().map(f -> CODE_WRAP + f + CODE_WRAP).toList());
+        String files = String.join(
+                ", ",
+                result.files().stream().map(f -> CODE_WRAP + f + CODE_WRAP).toList());
         sb.append("| Файл(-ы) | ").append(files).append("\n");
 
         var min = getMinDate(result);
         var max = getMaxDate(result);
         sb.append("| Начальная дата | ").append(min != null ? min : "-").append("\n");
         sb.append("| Конечная дата | ").append(max != null ? max : "-").append("\n");
-        sb.append("| Количество запросов | ").append(formatNumber(result.totalRequestsCount())).append("\n");
+        sb.append("| Количество запросов | ")
+                .append(formatNumber(result.totalRequestsCount()))
+                .append("\n");
 
         var s = result.responseSizeInBytes();
         sb.append("| Средний размер ответа | ").append(s.average()).append("b\n");
         sb.append("| Максимальный размер ответа | ")
-            .append(formatNumber((long) s.max())).append("b\n");
+                .append(formatNumber((long) s.max()))
+                .append("b\n");
         sb.append("| 95-й перцентиль | ").append(s.p95()).append("b\n");
 
         sb.append(TABLE_END).append("\n\n");
@@ -64,8 +69,13 @@ public class AsciiDocFormatter extends BaseReportFormatter {
         sb.append("| Ресурс | Количество\n");
 
         for (var r : result.resources()) {
-            sb.append("| ").append(CODE_WRAP).append(r.resource()).append(CODE_WRAP)
-                .append(" | ").append(formatNumber(r.totalRequestsCount())).append("\n");
+            sb.append("| ")
+                    .append(CODE_WRAP)
+                    .append(r.resource())
+                    .append(CODE_WRAP)
+                    .append(" | ")
+                    .append(formatNumber(r.totalRequestsCount()))
+                    .append("\n");
         }
 
         sb.append(TABLE_END).append("\n\n");
@@ -77,9 +87,13 @@ public class AsciiDocFormatter extends BaseReportFormatter {
         sb.append("| Код | Название | Количество\n");
 
         for (var rc : result.responseCodes()) {
-            sb.append("| ").append(rc.code())
-                .append(" | ").append(getHttpStatusName(rc.code()))
-                .append(" | ").append(formatNumber(rc.totalResponsesCount())).append("\n");
+            sb.append("| ")
+                    .append(rc.code())
+                    .append(" | ")
+                    .append(getHttpStatusName(rc.code()))
+                    .append(" | ")
+                    .append(formatNumber(rc.totalResponsesCount()))
+                    .append("\n");
         }
 
         sb.append(TABLE_END).append("\n\n");
@@ -91,10 +105,15 @@ public class AsciiDocFormatter extends BaseReportFormatter {
         sb.append("| Дата | День недели | Количество | Процент\n");
 
         for (var d : result.requestsPerDate()) {
-            sb.append("| ").append(d.date())
-                .append(" | ").append(d.weekday())
-                .append(" | ").append(formatNumber(d.totalRequestsCount()))
-                .append(" | ").append(String.format("%.2f", d.totalRequestsPercentage())).append("%\n");
+            sb.append("| ")
+                    .append(d.date())
+                    .append(" | ")
+                    .append(d.weekday())
+                    .append(" | ")
+                    .append(formatNumber(d.totalRequestsCount()))
+                    .append(" | ")
+                    .append(String.format("%.2f", d.totalRequestsPercentage()))
+                    .append("%\n");
         }
 
         sb.append(TABLE_END).append("\n\n");

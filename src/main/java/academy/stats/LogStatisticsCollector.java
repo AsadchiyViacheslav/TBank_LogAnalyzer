@@ -2,18 +2,16 @@ package academy.stats;
 
 import academy.enums.WeekDay;
 import academy.input.LogSource;
+import academy.model.DailyRequestStat;
 import academy.model.LogAnalysisResult;
-import academy.model.ResponseSizeStats;
+import academy.model.NginxLogEntry;
 import academy.model.ResourceStat;
 import academy.model.ResponseCodeStat;
-import academy.model.DailyRequestStat;
-import academy.model.NginxLogEntry;
-
+import academy.model.ResponseSizeStats;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,9 +55,7 @@ public class LogStatisticsCollector {
     }
 
     public LogAnalysisResult buildResult(List<LogSource> sources) {
-        List<String> fileNames = sources.stream()
-            .map(LogSource::getDescription)
-            .collect(Collectors.toList());
+        List<String> fileNames = sources.stream().map(LogSource::getDescription).collect(Collectors.toList());
 
         ResponseSizeStats sizeStats = calculateResponseSizeStats();
         List<ResourceStat> topResources = getTopResources();
@@ -69,8 +65,8 @@ public class LogStatisticsCollector {
 
         logger.info("Завершен сбор статистики: общее количество запросов={}", totalRequests);
 
-        return new LogAnalysisResult(fileNames, totalRequests, sizeStats,
-            topResources, responseCodeStats, dailyStats, uniqueProtocols);
+        return new LogAnalysisResult(
+                fileNames, totalRequests, sizeStats, topResources, responseCodeStats, dailyStats, uniqueProtocols);
     }
 
     private ResponseSizeStats calculateResponseSizeStats() {
@@ -80,7 +76,8 @@ public class LogStatisticsCollector {
         }
 
         Collections.sort(responseSizes);
-        double average = responseSizes.stream().mapToLong(Long::longValue).average().orElse(0);
+        double average =
+                responseSizes.stream().mapToLong(Long::longValue).average().orElse(0);
 
         long max = responseSizes.getLast();
         double p95 = calculatePercentile(95);
@@ -111,30 +108,30 @@ public class LogStatisticsCollector {
 
     private List<ResourceStat> getTopResources() {
         return resourceCounts.entrySet().stream()
-            .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
-            .limit(10)
-            .map(e -> new ResourceStat(e.getKey(), e.getValue()))
-            .collect(Collectors.toList());
+                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                .limit(10)
+                .map(e -> new ResourceStat(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
     }
 
     private List<ResponseCodeStat> getResponseCodeStats() {
         return statusCodeCounts.entrySet().stream()
-            .sorted((a, b) -> Integer.compare(b.getKey(), a.getKey()))
-            .map(e -> new ResponseCodeStat(e.getKey(), e.getValue()))
-            .collect(Collectors.toList());
+                .sorted((a, b) -> Integer.compare(b.getKey(), a.getKey()))
+                .map(e -> new ResponseCodeStat(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
     }
 
     private List<DailyRequestStat> getDailyRequestStats() {
         return dailyRequestCounts.entrySet().stream()
-            .map(e -> {
-                LocalDate date = e.getKey();
-                long count = e.getValue();
-                double percentage = round((count * 100.0) / totalRequests);
-                String dayName = getDayName(date.getDayOfWeek());
+                .map(e -> {
+                    LocalDate date = e.getKey();
+                    long count = e.getValue();
+                    double percentage = round((count * 100.0) / totalRequests);
+                    String dayName = getDayName(date.getDayOfWeek());
 
-                return new DailyRequestStat(date.toString(), dayName, count, percentage);
-            })
-            .collect(Collectors.toList());
+                    return new DailyRequestStat(date.toString(), dayName, count, percentage);
+                })
+                .collect(Collectors.toList());
     }
 
     private String getDayName(DayOfWeek dow) {
