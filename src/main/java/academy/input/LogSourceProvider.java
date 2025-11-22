@@ -19,6 +19,7 @@ public class LogSourceProvider {
     private static final String HTTP_PREFIX = "http://";
     private static final String HTTPS_PREFIX = "https://";
     private static final String CURRENT_DIR = ".";
+    private static final String WILDCARD = "*";
 
     public static List<LogSource> resolveSources(String[] paths) throws IOException {
         List<LogSource> sources = new ArrayList<>();
@@ -39,7 +40,7 @@ public class LogSourceProvider {
     private static List<LogSource> resolveLocalPath(String pathStr) throws IOException {
         List<LogSource> sources = new ArrayList<>();
 
-        if (pathStr.contains("*")) {
+        if (pathStr.contains(WILDCARD)) {
             Path basePath = getBasePathFromGlob(pathStr);
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher(GLOB_PREFIX + pathStr);
 
@@ -62,7 +63,7 @@ public class LogSourceProvider {
     }
 
     private static Path getBasePathFromGlob(String pathStr) {
-        int starIndex = pathStr.indexOf('*');
+        int starIndex = pathStr.indexOf(WILDCARD);
         if (starIndex == -1) {
             return Path.of(pathStr);
         }
