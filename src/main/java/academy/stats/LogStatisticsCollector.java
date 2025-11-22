@@ -8,6 +8,7 @@ import academy.model.NginxLogEntry;
 import academy.model.ResourceStat;
 import academy.model.ResponseCodeStat;
 import academy.model.ResponseSizeStats;
+import academy.util.DateUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
@@ -50,8 +51,7 @@ public class LogStatisticsCollector {
     }
 
     private boolean isInDateRange(LocalDate date) {
-        if (fromDate != null && date.isBefore(fromDate)) return false;
-        return toDate == null || !date.isAfter(toDate);
+        return DateUtils.isInRange(date, fromDate, toDate);
     }
 
     public LogAnalysisResult buildResult(List<LogSource> sources) {

@@ -9,8 +9,8 @@ import academy.output.OutputFileValidator;
 import academy.output.ReportWriter;
 import academy.parser.NginxLogParser;
 import academy.stats.LogStatisticsCollector;
+import academy.util.DateUtils;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,9 +64,9 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             ReportFileType fileType = ReportFileType.fromString(format);
             OutputFileValidator.validate(output, fileType);
 
-            LocalDate fromDate = parseDate(from);
-            LocalDate toDate = parseDate(to);
-            validateDateRange(fromDate, toDate);
+            LocalDate fromDate = DateUtils.parse(from);
+            LocalDate toDate = DateUtils.parse(to);
+            DateUtils.validateRange(fromDate, toDate);
 
             var logSources = LogSourceProvider.resolveSources(paths);
             if (logSources.isEmpty()) {
@@ -94,21 +94,6 @@ public class LogAnalyzerCommand implements Callable<Integer> {
         } catch (Exception e) {
             logger.error("Неизвестная ошибка", e);
             return 1;
-        }
-    }
-
-    private LocalDate parseDate(String dateStr) {
-        if (dateStr == null) return null;
-        try {
-            return LocalDate.parse(dateStr);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Недопустимый формат даты: " + dateStr);
-        }
-    }
-
-    private void validateDateRange(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate != null && toDate != null && !fromDate.isBefore(toDate)) {
-            throw new IllegalArgumentException("Дата начала должна быть до даты конца");
         }
     }
 }
