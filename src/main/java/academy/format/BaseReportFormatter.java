@@ -16,12 +16,12 @@ public abstract class BaseReportFormatter implements ReportFormatter {
 
     protected LocalDate getMinDate(LogAnalysisResult result) {
         if (result.requestsPerDate().isEmpty()) return null;
-        return LocalDate.parse(result.requestsPerDate().get(0).date());
+        return LocalDate.parse(result.requestsPerDate().getFirst().date());
     }
 
     protected LocalDate getMaxDate(LogAnalysisResult result) {
         if (result.requestsPerDate().isEmpty()) return null;
         var list = result.requestsPerDate();
-        return LocalDate.parse(list.get(list.size() - 1).date());
+        return LocalDate.parse(list.getLast().date());
     }
 }
