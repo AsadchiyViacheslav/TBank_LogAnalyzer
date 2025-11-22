@@ -207,7 +207,8 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.42</version> <scope>provided</scope>
+                <version>1.18.42</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- Apache Commons -->
@@ -414,7 +415,8 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version> </path>
+                                <version>${lombok.version}</version>
+                            </path>
 
                             <path>
                                 <groupId>info.picocli</groupId>
