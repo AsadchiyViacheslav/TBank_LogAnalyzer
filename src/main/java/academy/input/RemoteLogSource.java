@@ -18,8 +18,8 @@ public class RemoteLogSource implements LogSource {
 
     @Override
     public Stream<String> getLineStream() throws IOException {
-
         java.net.URI uri;
+
         try {
             uri = new java.net.URI(url);
         } catch (java.net.URISyntaxException e) {
@@ -27,27 +27,37 @@ public class RemoteLogSource implements LogSource {
         }
 
         HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(5000);
-        conn.setReadTimeout(5000);
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode == 404) {
-            throw new IOException("Удаленный файл не найден (404): " + url);
-        }
-        if (responseCode != 200) {
-            throw new IOException("Не удалось получить удаленный файл. Код состояния: " + responseCode);
-        }
+        try {
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        return reader.lines().onClose(() -> {
-            try {
-                reader.close();
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 404) {
                 conn.disconnect();
-            } catch (IOException e) {
-                logger.warn("Ошибка при закрытии соединения", e);
+                throw new IOException("Удаленный файл не найден (404): " + url);
             }
-        });
+            if (responseCode != 200) {
+                conn.disconnect();
+                throw new IOException("Не удалось получить удаленный файл. Код: " + responseCode);
+            }
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            return reader.lines().onClose(() -> {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    logger.warn("Ошибка при закрытии reader", e);
+                }
+                conn.disconnect();
+            });
+
+        } catch (IOException e) {
+            conn.disconnect();
+            throw e;
+        }
     }
 
     @Override
