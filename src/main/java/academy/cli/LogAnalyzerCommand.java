@@ -1,5 +1,6 @@
 package academy.cli;
 
+import academy.enums.ReportFileType;
 import academy.format.ReportFormatter;
 import academy.format.factory.FormatterFactory;
 import academy.input.LogSourceProvider;
@@ -27,7 +28,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             names = {"-p", "--path"},
             required = true,
             arity = "1..*",
-            description = "Пути к файлам логов NGINX (поддерживает шаблоны глобальных объектов и URL-адреса)")
+            description = "Пути к файлам логов NGINX")
     private String[] paths;
 
     @CommandLine.Option(
@@ -56,31 +57,23 @@ public class LogAnalyzerCommand implements Callable<Integer> {
     public Integer call() {
         try {
             logger.info("Запуск анализа логов");
-            logger.info("Пути, поданные на вход: {}", String.join(", ", paths));
-            logger.info("Выходной формате: {}", format);
+            logger.info("Пути: {}", String.join(", ", paths));
+            logger.info("Выходной формат: {}", format);
             logger.info("Выходной файл: {}", output);
 
-            validateFormat();
-            OutputFileValidator.validate(output, format);
+            ReportFileType fileType = ReportFileType.fromString(format);
+            OutputFileValidator.validate(output, fileType);
 
             LocalDate fromDate = parseDate(from);
             LocalDate toDate = parseDate(to);
             validateDateRange(fromDate, toDate);
 
-            logger.info("Сбор источников логов");
             var logSources = LogSourceProvider.resolveSources(paths);
-
             if (logSources.isEmpty()) {
                 logger.error("Файлов с логами не найдено");
                 return 2;
             }
 
-            logger.info("Найдено {} источников логов", logSources.size());
-            for (var source : logSources) {
-                logger.info("Источник логов: {}", source.getDescription());
-            }
-
-            logger.info("Начало сбора статистики");
             var collector = new LogStatisticsCollector(fromDate, toDate);
             for (var source : logSources) {
                 try (var lineStream = source.getLineStream()) {
@@ -89,9 +82,8 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             }
 
             LogAnalysisResult result = collector.buildResult(logSources);
-
-            ReportFormatter formatter = FormatterFactory.createFormatter(format);
-            String report = formatter.format(result);
+            ReportFormatter formatterObj = FormatterFactory.createFormatter(fileType);
+            String report = formatterObj.format(result);
 
             ReportWriter.write(output, report);
 
@@ -105,24 +97,18 @@ public class LogAnalyzerCommand implements Callable<Integer> {
         }
     }
 
-    private void validateFormat() {
-        if (!format.matches("json|markdown|adoc")) {
-            throw new IllegalArgumentException("Неподдерживаемый формат: " + format + ". Поддерживаемые: json, markdown, adoc");
-        }
-    }
-
     private LocalDate parseDate(String dateStr) {
         if (dateStr == null) return null;
         try {
             return LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Недопустимый формат даты: " + dateStr + ". Ожидается формат ISO8601 (yyyy-MM-dd)");
+            throw new IllegalArgumentException("Недопустимый формат даты: " + dateStr);
         }
     }
 
     private void validateDateRange(LocalDate fromDate, LocalDate toDate) {
         if (fromDate != null && toDate != null && !fromDate.isBefore(toDate)) {
-            throw new IllegalArgumentException("Дата с (from) должна быть до даты до (to)");
+            throw new IllegalArgumentException("Дата начала должна быть до даты конца");
         }
     }
 }
