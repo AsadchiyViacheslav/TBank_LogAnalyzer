@@ -1,6 +1,6 @@
 package academy.stats;
 
-import academy.io.LogSource;
+import academy.input.LogSource;
 import academy.model.LogAnalysisResult;
 import academy.model.ResponseSizeStats;
 import academy.model.ResourceStat;
