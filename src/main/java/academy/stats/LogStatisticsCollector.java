@@ -1,5 +1,6 @@
 package academy.stats;
 
+import academy.enums.WeekDay;
 import academy.input.LogSource;
 import academy.model.LogAnalysisResult;
 import academy.model.ResponseSizeStats;
@@ -137,15 +138,7 @@ public class LogStatisticsCollector {
     }
 
     private String getDayName(DayOfWeek dow) {
-        return switch (dow) {
-            case MONDAY -> "Monday";
-            case TUESDAY -> "Tuesday";
-            case WEDNESDAY -> "Wednesday";
-            case THURSDAY -> "Thursday";
-            case FRIDAY -> "Friday";
-            case SATURDAY -> "Saturday";
-            case SUNDAY -> "Sunday";
-        };
+        return WeekDay.fromJavaDay(dow).getDisplayName();
     }
 
     private double round(double value) {
