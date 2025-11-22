@@ -13,12 +13,19 @@ import org.apache.logging.log4j.Logger;
 public class LogSourceProvider {
     private static final Logger logger = LogManager.getLogger(LogSourceProvider.class);
 
+    private static final String LOG_EXTENSION = ".log";
+    private static final String TXT_EXTENSION = ".txt";
+    private static final String GLOB_PREFIX = "glob:";
+    private static final String HTTP_PREFIX = "http://";
+    private static final String HTTPS_PREFIX = "https://";
+    private static final String CURRENT_DIR = ".";
+
     public static List<LogSource> resolveSources(String[] paths) throws IOException {
         List<LogSource> sources = new ArrayList<>();
 
         for (String pathStr : paths) {
             if (isUrl(pathStr)) {
-                logger.info("Найден Url источник: {}", pathStr);
+                logger.info("Найден URL источник: {}", pathStr);
                 sources.add(new RemoteLogSource(pathStr));
             } else {
                 logger.info("Найден Local источник: {}", pathStr);
@@ -34,8 +41,7 @@ public class LogSourceProvider {
 
         if (pathStr.contains("*")) {
             Path basePath = getBasePathFromGlob(pathStr);
-
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pathStr);
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher(GLOB_PREFIX + pathStr);
 
             try (var stream = Files.walk(basePath)) {
                 stream.filter(Files::isRegularFile).filter(matcher::matches).forEach(p -> {
@@ -56,7 +62,6 @@ public class LogSourceProvider {
     }
 
     private static Path getBasePathFromGlob(String pathStr) {
-
         int starIndex = pathStr.indexOf('*');
         if (starIndex == -1) {
             return Path.of(pathStr);
@@ -66,7 +71,7 @@ public class LogSourceProvider {
         int lastSeparator = Math.max(basePart.lastIndexOf('/'), basePart.lastIndexOf('\\'));
 
         if (lastSeparator == -1) {
-            return Path.of(".");
+            return Path.of(CURRENT_DIR);
         }
 
         String basePath = pathStr.substring(0, lastSeparator);
@@ -74,12 +79,12 @@ public class LogSourceProvider {
     }
 
     private static void validateFileExtension(String path) {
-        if (!path.endsWith(".log") && !path.endsWith(".txt")) {
+        if (!path.endsWith(LOG_EXTENSION) && !path.endsWith(TXT_EXTENSION)) {
             throw new IllegalArgumentException("Неподдерживаемый формат файла: " + path);
         }
     }
 
     private static boolean isUrl(String path) {
-        return path.startsWith("http://") || path.startsWith("https://");
+        return path.startsWith(HTTP_PREFIX) || path.startsWith(HTTPS_PREFIX);
     }
 }
