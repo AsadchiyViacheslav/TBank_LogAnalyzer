@@ -22,7 +22,8 @@ public class LocalLogSource implements LogSource {
 
     @Override
     public String getDescription() {
-        return path.getFileName().toString();
+        Path fileName = path.getFileName();
+        return fileName != null ? fileName.toString() : path.toString();
     }
 
     @Override
