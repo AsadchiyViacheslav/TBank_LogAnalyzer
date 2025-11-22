@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class OutputFileValidator {
+    private static final String DOT = ".";
+    private static final int EXTENSION_OFFSET = 1;
 
     public static void validate(String output, String format) throws IOException {
         Path outputPath = Path.of(output);
@@ -34,7 +36,7 @@ public class OutputFileValidator {
     }
 
     private static String getFileExtension(String filename) {
-        int lastDot = filename.lastIndexOf('.');
-        return lastDot > 0 ? filename.substring(lastDot + 1) : "";
+        int lastDot = filename.lastIndexOf(DOT);
+        return lastDot > 0 ? filename.substring(lastDot + EXTENSION_OFFSET) : "";
     }
 }
