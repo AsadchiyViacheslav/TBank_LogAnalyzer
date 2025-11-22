@@ -126,7 +126,7 @@ public class LogStatisticsCollector {
                 .map(e -> {
                     LocalDate date = e.getKey();
                     long count = e.getValue();
-                    double percentage = round((count * 100.0) / totalRequests);
+                    double percentage = round(count * 100.0 / totalRequests);
                     String dayName = getDayName(date.getDayOfWeek());
 
                     return new DailyRequestStat(date.toString(), dayName, count, percentage);

@@ -18,7 +18,7 @@
         <revision>1.0</revision>
 
         <!-- java and maven versions -->
-        <maven.version>3.9.11</maven.version>
+        <maven.version>3.9.9</maven.version>
         <java.release>24</java.release>
         <jdk.version>24</jdk.version>
 
