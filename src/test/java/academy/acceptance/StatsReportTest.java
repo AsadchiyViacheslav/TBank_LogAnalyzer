@@ -3,15 +3,15 @@ package academy.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import academy.util.TestUtils;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class StatsReportTest {
 
@@ -43,11 +43,7 @@ public class StatsReportTest {
         outputPath = TestUtils.createOutputPath("json");
         outputFilePath = Path.of(outputPath);
 
-        int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", "json",
-            "-o", outputPath
-        );
+        int exitCode = cmd.execute("-p", logFile.getAbsolutePath(), "-f", "json", "-o", outputPath);
 
         assertThat(exitCode).isEqualTo(0);
         String content = Files.readString(outputFilePath);
@@ -61,11 +57,7 @@ public class StatsReportTest {
         outputPath = TestUtils.createOutputPath("md");
         outputFilePath = Path.of(outputPath);
 
-        int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", "markdown",
-            "-o", outputPath
-        );
+        int exitCode = cmd.execute("-p", logFile.getAbsolutePath(), "-f", "markdown", "-o", outputPath);
 
         assertThat(exitCode).isEqualTo(0);
         String content = Files.readString(outputFilePath);
@@ -79,11 +71,7 @@ public class StatsReportTest {
         outputPath = TestUtils.createOutputPath("adoc");
         outputFilePath = Path.of(outputPath);
 
-        int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", "adoc",
-            "-o", outputPath
-        );
+        int exitCode = cmd.execute("-p", logFile.getAbsolutePath(), "-f", "adoc", "-o", outputPath);
 
         assertThat(exitCode).isEqualTo(0);
         String content = Files.readString(outputFilePath);

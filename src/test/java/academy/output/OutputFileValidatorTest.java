@@ -1,10 +1,12 @@
 package academy.output;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import academy.enums.ReportFileType;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,12 +21,12 @@ class OutputFileValidatorTest {
     private void deleteQuietly(Path path) {
         try {
             Files.deleteIfExists(path);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     private void validate(String path, ReportFileType type) {
-        assertThatCode(() -> OutputFileValidator.validate(path, type))
-            .doesNotThrowAnyException();
+        assertThatCode(() -> OutputFileValidator.validate(path, type)).doesNotThrowAnyException();
     }
 
     @Test
@@ -46,8 +48,8 @@ class OutputFileValidatorTest {
         Path file = dir.resolve("report.txt");
 
         assertThatThrownBy(() -> OutputFileValidator.validate(file.toString(), ReportFileType.JSON))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Расширение выходного файла должно быть");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Расширение выходного файла должно быть");
 
         deleteQuietly(dir);
     }
@@ -59,8 +61,8 @@ class OutputFileValidatorTest {
 
         try {
             assertThatThrownBy(() -> OutputFileValidator.validate(existing.toString(), ReportFileType.JSON))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Выходной файл уже существует");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Выходной файл уже существует");
         } finally {
             deleteQuietly(existing);
         }
@@ -71,12 +73,13 @@ class OutputFileValidatorTest {
     @DisplayName("Проверка расширения для всех форматов")
     void testAllFormats(String ext) throws IOException {
         Path dir = createTempDir();
-        ReportFileType type = switch (ext) {
-            case "json" -> ReportFileType.JSON;
-            case "md"   -> ReportFileType.MARKDOWN;
-            case "adoc" -> ReportFileType.ADOC;
-            default -> throw new IllegalStateException();
-        };
+        ReportFileType type =
+                switch (ext) {
+                    case "json" -> ReportFileType.JSON;
+                    case "md" -> ReportFileType.MARKDOWN;
+                    case "adoc" -> ReportFileType.ADOC;
+                    default -> throw new IllegalStateException();
+                };
 
         Path file = dir.resolve("report." + ext);
 

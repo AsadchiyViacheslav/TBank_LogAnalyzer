@@ -18,15 +18,14 @@ class DateUtilsTest {
     @BeforeEach
     void setUp() {
         from = LocalDate.of(2025, 1, 1);
-        to   = LocalDate.of(2025, 1, 31);
-        mid  = LocalDate.of(2025, 1, 15);
+        to = LocalDate.of(2025, 1, 31);
+        mid = LocalDate.of(2025, 1, 15);
     }
 
     @Test
     @DisplayName("Валидная дата в формате ISO8601")
     void testParseValidDate() {
-        assertThat(DateUtils.parse("2025-01-15"))
-            .isEqualTo(LocalDate.of(2025, 1, 15));
+        assertThat(DateUtils.parse("2025-01-15")).isEqualTo(LocalDate.of(2025, 1, 15));
     }
 
     @Test
@@ -40,8 +39,8 @@ class DateUtilsTest {
     @DisplayName("Невалидный формат даты выбрасывает исключение")
     void testParseInvalidFormat(String invalidDate) {
         assertThatThrownBy(() -> DateUtils.parse(invalidDate))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Недопустимый формат даты");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Недопустимый формат даты");
     }
 
     @Test
@@ -54,15 +53,14 @@ class DateUtilsTest {
     @DisplayName("Диапазон дат - from равен to")
     void testValidateRangeEqual() {
         assertThatThrownBy(() -> DateUtils.validateRange(from, from))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Дата начала должна быть до даты конца");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Дата начала должна быть до даты конца");
     }
 
     @Test
     @DisplayName("Диапазон дат - from > to")
     void testValidateRangeInvalid() {
-        assertThatThrownBy(() -> DateUtils.validateRange(to, from))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> DateUtils.validateRange(to, from)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

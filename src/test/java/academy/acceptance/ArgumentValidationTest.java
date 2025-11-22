@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import picocli.CommandLine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import picocli.CommandLine;
 
 public class ArgumentValidationTest {
 
@@ -46,10 +46,9 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         int exitCode = cmd.execute(
-            "-p", "/nonexistent/file.log",
-            "-f", "json",
-            "-o", outputPath
-        );
+                "-p", "/nonexistent/file.log",
+                "-f", "json",
+                "-o", outputPath);
 
         assertThat(exitCode).isEqualTo(2);
     }
@@ -61,10 +60,9 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         int exitCode = cmd.execute(
-            "-p", "https://example.com/nonexistent.log",
-            "-f", "json",
-            "-o", outputPath
-        );
+                "-p", "https://example.com/nonexistent.log",
+                "-f", "json",
+                "-o", outputPath);
 
         assertThat(exitCode).isEqualTo(2);
     }
@@ -78,11 +76,7 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         try {
-            int exitCode = cmd.execute(
-                "-p", unsupportedFile.getAbsolutePath(),
-                "-f", "json",
-                "-o", outputPath
-            );
+            int exitCode = cmd.execute("-p", unsupportedFile.getAbsolutePath(), "-f", "json", "-o", outputPath);
             assertThat(exitCode).isEqualTo(2);
         } finally {
             Files.deleteIfExists(unsupportedFile.toPath());
@@ -99,8 +93,8 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         String[] args = dateStr == null
-            ? new String[]{"-p", logFile.getAbsolutePath(), "-f", "json", "-o", outputPath, "--from"}
-            : new String[]{"-p", logFile.getAbsolutePath(), "-f", "json", "-o", outputPath, "--from", dateStr};
+                ? new String[] {"-p", logFile.getAbsolutePath(), "-f", "json", "-o", outputPath, "--from"}
+                : new String[] {"-p", logFile.getAbsolutePath(), "-f", "json", "-o", outputPath, "--from", dateStr};
 
         int exitCode = cmd.execute(args);
         assertThat(exitCode).isIn(1, 2);
@@ -115,10 +109,9 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", format,
-            "-o", outputPath
-        );
+                "-p", logFile.getAbsolutePath(),
+                "-f", format,
+                "-o", outputPath);
         assertThat(exitCode).isEqualTo(2);
     }
 
@@ -131,10 +124,9 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", format,
-            "-o", outputPath
-        );
+                "-p", logFile.getAbsolutePath(),
+                "-f", format,
+                "-o", outputPath);
         assertThat(exitCode).isEqualTo(2);
     }
 
@@ -147,10 +139,9 @@ public class ArgumentValidationTest {
 
         try {
             int exitCode = cmd.execute(
-                "-p", logFile.getAbsolutePath(),
-                "-f", "json",
-                "-o", outputFile.getAbsolutePath()
-            );
+                    "-p", logFile.getAbsolutePath(),
+                    "-f", "json",
+                    "-o", outputFile.getAbsolutePath());
             assertThat(exitCode).isEqualTo(2);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -191,12 +182,7 @@ public class ArgumentValidationTest {
         outputPath = TestUtils.createOutputPath("json");
         outputFilePath = Path.of(outputPath);
 
-        int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", "json",
-            "-o", outputPath,
-            param, "value"
-        );
+        int exitCode = cmd.execute("-p", logFile.getAbsolutePath(), "-f", "json", "-o", outputPath, param, "value");
         assertThat(exitCode).isNotEqualTo(0);
     }
 
@@ -208,12 +194,11 @@ public class ArgumentValidationTest {
         outputFilePath = Path.of(outputPath);
 
         int exitCode = cmd.execute(
-            "-p", logFile.getAbsolutePath(),
-            "-f", "json",
-            "-o", outputPath,
-            "--from", "2025-12-31",
-            "--to", "2025-01-01"
-        );
+                "-p", logFile.getAbsolutePath(),
+                "-f", "json",
+                "-o", outputPath,
+                "--from", "2025-12-31",
+                "--to", "2025-01-01");
         assertThat(exitCode).isEqualTo(2);
     }
 }

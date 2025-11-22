@@ -23,7 +23,8 @@ public class NginxLogParserTest {
     void testParseValidLine() {
         String validLine = academy.util.TestUtils.TEST_LOG_LINES[0];
         NginxLogParser.parseStream(Stream.of(validLine), collector);
-        assertThat(collector.buildResult(java.util.List.of()).totalRequestsCount()).isEqualTo(1);
+        assertThat(collector.buildResult(java.util.List.of()).totalRequestsCount())
+                .isEqualTo(1);
     }
 
     @Test
@@ -31,7 +32,7 @@ public class NginxLogParserTest {
     void testParseInvalidLine() {
         String invalidLine = academy.util.TestUtils.createInvalidLogLine();
         assertThatCode(() -> NginxLogParser.parseStream(Stream.of(invalidLine), collector))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -39,7 +40,7 @@ public class NginxLogParserTest {
     void testParseMultipleLines() {
         NginxLogParser.parseStream(Stream.of(academy.util.TestUtils.TEST_LOG_LINES), collector);
         assertThat(collector.buildResult(java.util.List.of()).totalRequestsCount())
-            .isEqualTo(academy.util.TestUtils.TOTAL_REQUESTS);
+                .isEqualTo(academy.util.TestUtils.TOTAL_REQUESTS);
     }
 
     @Test

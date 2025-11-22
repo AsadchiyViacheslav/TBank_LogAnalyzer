@@ -20,10 +20,7 @@ class LogStatisticsCollectorTest {
 
     @BeforeEach
     void setUp() {
-        collector = new LogStatisticsCollector(
-            LocalDate.of(2015, 1, 1),
-            LocalDate.of(2025, 12, 31)
-        );
+        collector = new LogStatisticsCollector(LocalDate.of(2015, 1, 1), LocalDate.of(2025, 12, 31));
     }
 
     @Test
@@ -37,24 +34,21 @@ class LogStatisticsCollectorTest {
     @DisplayName("Расчет среднего размера ответа")
     void testAverageResponseSize() throws IOException {
         LogAnalysisResult result = parseDefault();
-        assertThat(result.responseSizeInBytes().average())
-            .isCloseTo(TestUtils.AVERAGE_RESPONSE_SIZE, within(0.01));
+        assertThat(result.responseSizeInBytes().average()).isCloseTo(TestUtils.AVERAGE_RESPONSE_SIZE, within(0.01));
     }
 
     @Test
     @DisplayName("Расчет максимального размера ответа")
     void testMaxResponseSize() throws IOException {
         LogAnalysisResult result = parseDefault();
-        assertThat(result.responseSizeInBytes().max())
-            .isEqualTo(TestUtils.MAX_RESPONSE_SIZE);
+        assertThat(result.responseSizeInBytes().max()).isEqualTo(TestUtils.MAX_RESPONSE_SIZE);
     }
 
     @Test
     @DisplayName("Расчет 95-го перцентиля")
     void testP95ResponseSize() throws IOException {
         LogAnalysisResult result = parseDefault();
-        assertThat(result.responseSizeInBytes().p95())
-            .isCloseTo(TestUtils.P95_RESPONSE_SIZE, within(0.01));
+        assertThat(result.responseSizeInBytes().p95()).isCloseTo(TestUtils.P95_RESPONSE_SIZE, within(0.01));
     }
 
     @Test
@@ -74,10 +68,8 @@ class LogStatisticsCollectorTest {
     @Test
     @DisplayName("Фильтрация по диапазону дат")
     void testDateRangeFiltering() throws IOException {
-        LogStatisticsCollector filteredCollector = new LogStatisticsCollector(
-            LocalDate.of(2015, 5, 23),
-            LocalDate.of(2015, 5, 23)
-        );
+        LogStatisticsCollector filteredCollector =
+                new LogStatisticsCollector(LocalDate.of(2015, 5, 23), LocalDate.of(2015, 5, 23));
 
         LogAnalysisResult result = parseAndBuildResult(filteredCollector);
         assertThat(result.totalRequestsCount()).isEqualTo(2);

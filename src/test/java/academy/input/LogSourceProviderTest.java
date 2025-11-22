@@ -29,8 +29,7 @@ class LogSourceProviderTest {
     @Test
     @DisplayName("Несуществующий файл выбрасывает исключение")
     void testNonExistentFileThrows() {
-        assertThatThrownBy(() -> resolve("/nonexistent/file.log"))
-            .isInstanceOf(IOException.class);
+        assertThatThrownBy(() -> resolve("/nonexistent/file.log")).isInstanceOf(IOException.class);
     }
 
     @Test
@@ -40,8 +39,8 @@ class LogSourceProviderTest {
 
         try {
             assertThatThrownBy(() -> resolve(badFile.getAbsolutePath()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Неподдерживаемый формат файла");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Неподдерживаемый формат файла");
         } finally {
             deleteQuietly(badFile);
         }
@@ -50,7 +49,8 @@ class LogSourceProviderTest {
     private void deleteQuietly(File file) {
         try {
             Files.deleteIfExists(file.toPath());
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     private List<LogSource> resolve(String... paths) throws IOException {
