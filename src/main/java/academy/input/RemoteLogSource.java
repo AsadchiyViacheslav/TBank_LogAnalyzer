@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RemoteLogSource implements LogSource {
-    private static final Logger logger = LogManager.getLogger(RemoteLogSource.class);
     private final String url;
 
     public RemoteLogSource(String url) {
@@ -18,11 +20,10 @@ public class RemoteLogSource implements LogSource {
 
     @Override
     public Stream<String> getLineStream() throws IOException {
-        java.net.URI uri;
-
+        URI uri;
         try {
-            uri = new java.net.URI(url);
-        } catch (java.net.URISyntaxException e) {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
             throw new IOException("Невалидный URL: " + url, e);
         }
 
@@ -35,28 +36,20 @@ public class RemoteLogSource implements LogSource {
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 404) {
-                conn.disconnect();
-                throw new IOException("Удаленный файл не найден (404): " + url);
+                throw new IOException("Удалённый файл не найден (404): " + url);
             }
             if (responseCode != 200) {
-                conn.disconnect();
-                throw new IOException("Не удалось получить удаленный файл. Код: " + responseCode);
+                throw new IOException("Не удалось получить удалённый файл. Код: " + responseCode);
             }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
 
-            return reader.lines().onClose(() -> {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    logger.warn("Ошибка при закрытии reader", e);
-                }
-                conn.disconnect();
-            });
+                List<String> lines = reader.lines().toList();
+                return lines.stream();
+            }
 
-        } catch (IOException e) {
+        } finally {
             conn.disconnect();
-            throw e;
         }
     }
 
