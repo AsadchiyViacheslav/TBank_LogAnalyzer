@@ -10,6 +10,7 @@ import academy.output.ReportWriter;
 import academy.parser.NginxLogParser;
 import academy.stats.LogStatisticsCollector;
 import academy.util.DateUtils;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
@@ -90,6 +91,9 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             return 0;
         } catch (IllegalArgumentException e) {
             logger.error("Ошибка валидации: {}", e.getMessage());
+            return 2;
+        } catch (IOException e) {
+            logger.error("Ошибка ввода: {}", e.getMessage());
             return 2;
         } catch (Exception e) {
             logger.error("Неизвестная ошибка", e);
