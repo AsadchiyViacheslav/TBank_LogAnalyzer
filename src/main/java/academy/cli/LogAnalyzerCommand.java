@@ -2,8 +2,9 @@ package academy.cli;
 
 import academy.format.ReportFormatter;
 import academy.format.factory.FormatterFactory;
-import academy.io.LogSourceProvider;
+import academy.input.LogSourceProvider;
 import academy.model.LogAnalysisResult;
+import academy.output.OutputFileValidator;
 import academy.output.ReportWriter;
 import academy.parser.NginxLogParser;
 import academy.stats.LogStatisticsCollector;
@@ -60,6 +61,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             logger.info("Выходной файл: {}", output);
 
             validateFormat();
+            OutputFileValidator.validate(output, format);
 
             LocalDate fromDate = parseDate(from);
             LocalDate toDate = parseDate(to);
@@ -91,8 +93,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             ReportFormatter formatter = FormatterFactory.createFormatter(format);
             String report = formatter.format(result);
 
-            ReportWriter.write(output, report, format);
-            logger.info("Отчет сохранен в {}", output);
+            ReportWriter.write(output, report);
 
             return 0;
         } catch (IllegalArgumentException e) {
