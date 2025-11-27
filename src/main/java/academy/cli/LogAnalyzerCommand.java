@@ -1,5 +1,6 @@
 package academy.cli;
 
+import academy.cli.converter.ReportFileTypeConverter;
 import academy.enums.ReportFileType;
 import academy.format.ReportFormatter;
 import academy.format.factory.FormatterFactory;
@@ -15,9 +16,10 @@ import java.time.LocalDate;
 import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-@CommandLine.Command(
+@Command(
         name = "log-analyzer",
         version = "1.0.0",
         description = "Утилита для анализа логов NGINX",
@@ -25,31 +27,32 @@ import picocli.CommandLine;
 public class LogAnalyzerCommand implements Callable<Integer> {
     private static final Logger logger = LogManager.getLogger(LogAnalyzerCommand.class);
 
-    @CommandLine.Option(
+    @Option(
             names = {"-p", "--path"},
             required = true,
             arity = "1..*",
             description = "Пути к файлам логов NGINX")
     private String[] paths;
 
-    @CommandLine.Option(
-            names = {"-f", "--format"},
-            required = true,
-            description = "Выходной формат: json, markdown, adoc")
-    private String format;
+    @Option(
+        names = {"-f", "--format"},
+        required = true,
+        converter = ReportFileTypeConverter.class,
+        description = "Выходной формат: json, markdown, adoc")
+    private ReportFileType format;
 
-    @CommandLine.Option(
+    @Option(
             names = {"-o", "--output"},
             required = true,
             description = "Путь к выходному файлу")
     private String output;
 
-    @CommandLine.Option(
+    @Option(
             names = {"--from"},
             description = "Дата начала (ISO8601 format)")
     private String from;
 
-    @CommandLine.Option(
+    @Option(
             names = {"--to"},
             description = "Дата конца (ISO8601 format)")
     private String to;
@@ -62,8 +65,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             logger.info("Выходной формат: {}", format);
             logger.info("Выходной файл: {}", output);
 
-            ReportFileType fileType = ReportFileType.fromString(format);
-            OutputFileValidator.validate(output, fileType);
+            OutputFileValidator.validate(output, format);
 
             LocalDate fromDate = DateUtils.parse(from);
             LocalDate toDate = DateUtils.parse(to);
@@ -71,8 +73,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
 
             var logSources = LogSourceProvider.resolveSources(paths);
             if (logSources.isEmpty()) {
-                logger.error("Файлов с логами не найдено");
-                return 2;
+                throw new IOException("Файлов с логами не найдено");
             }
 
             var collector = new LogStatisticsCollector(fromDate, toDate);
@@ -83,7 +84,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
             }
 
             LogAnalysisResult result = collector.buildResult(logSources);
-            ReportFormatter formatterObj = FormatterFactory.createFormatter(fileType);
+            ReportFormatter formatterObj = FormatterFactory.createFormatter(format);
             String report = formatterObj.format(result);
 
             ReportWriter.write(output, report);
