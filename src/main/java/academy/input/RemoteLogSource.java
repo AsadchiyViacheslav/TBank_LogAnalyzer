@@ -1,5 +1,6 @@
 package academy.input;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +19,18 @@ public class RemoteLogSource implements LogSource {
         this.url = url;
     }
 
+    /*
+     * Анализатор SpotBugs (правило OS_OPEN_STREAM) помечает этот метод как потенциальную утечку ресурсов,
+     * так как BufferedReader не обернут в конструкцию try-with-resources.
+     *
+     * Однако, для реализации ленивого (потокового) построчного чтения (reader.lines())
+     * BufferedReader должен оставаться открытым до тех пор, пока внешний Stream не будет закрыт.
+     *
+     * Закрытие всех ресурсов (BufferedReader и HttpURLConnection) явно гарантировано
+     * вызовом .onClose() на возвращаемом Stream, поэтому добавил подавление предупреждения.
+     */
     @Override
+    @SuppressFBWarnings("OS_OPEN_STREAM")
     public Stream<String> getLineStream() throws IOException {
         URI uri;
         try {
@@ -43,18 +55,17 @@ public class RemoteLogSource implements LogSource {
             throw new IOException("Не удалось получить удалённый файл. Код: " + responseCode);
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-            return reader.lines().onClose(() -> {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    logger.warn("Ошибка при закрытии reader для URL: {}", url, e);
-                } finally {
-                    conn.disconnect();
-                }
-            });
-        }
+        return reader.lines().onClose(() -> {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                logger.warn("Ошибка при закрытии reader для URL: {}", url, e);
+            } finally {
+                conn.disconnect();
+            }
+        });
     }
 
     @Override
