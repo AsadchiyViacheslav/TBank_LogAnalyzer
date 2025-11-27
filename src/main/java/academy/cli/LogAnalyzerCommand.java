@@ -35,10 +35,10 @@ public class LogAnalyzerCommand implements Callable<Integer> {
     private String[] paths;
 
     @Option(
-        names = {"-f", "--format"},
-        required = true,
-        converter = ReportFileTypeConverter.class,
-        description = "Выходной формат: json, markdown, adoc")
+            names = {"-f", "--format"},
+            required = true,
+            converter = ReportFileTypeConverter.class,
+            description = "Выходной формат: json, markdown, adoc")
     private ReportFileType format;
 
     @Option(

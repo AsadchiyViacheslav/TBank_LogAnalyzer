@@ -3,7 +3,7 @@ package academy.enums;
 import lombok.Getter;
 
 @Getter
-public enum     ReportFileType {
+public enum ReportFileType {
     JSON("json"),
     MARKDOWN("md"),
     ADOC("adoc");
