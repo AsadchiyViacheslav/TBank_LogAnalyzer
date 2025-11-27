@@ -6,10 +6,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RemoteLogSource implements LogSource {
+    private static final Logger logger = LogManager.getLogger(RemoteLogSource.class);
     private final String url;
 
     public RemoteLogSource(String url) {
@@ -27,27 +29,31 @@ public class RemoteLogSource implements LogSource {
 
         HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
 
-        try {
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
 
-            int responseCode = conn.getResponseCode();
-            if (responseCode == 404) {
-                throw new IOException("Удалённый файл не найден (404): " + url);
-            }
-            if (responseCode != 200) {
-                throw new IOException("Не удалось получить удалённый файл. Код: " + responseCode);
-            }
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-
-                List<String> lines = reader.lines().toList();
-                return lines.stream();
-            }
-
-        } finally {
+        int responseCode = conn.getResponseCode();
+        if (responseCode == 404) {
             conn.disconnect();
+            throw new IOException("Удалённый файл не найден (404): " + url);
+        }
+        if (responseCode != 200) {
+            conn.disconnect();
+            throw new IOException("Не удалось получить удалённый файл. Код: " + responseCode);
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+
+            return reader.lines().onClose(() -> {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    logger.warn("Ошибка при закрытии reader для URL: {}", url, e);
+                } finally {
+                    conn.disconnect();
+                }
+            });
         }
     }
 
