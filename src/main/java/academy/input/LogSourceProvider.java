@@ -1,5 +1,6 @@
 package academy.input;
 
+import academy.exception.UserInputException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -21,16 +22,20 @@ public class LogSourceProvider {
     private static final String CURRENT_DIR = ".";
     private static final String WILDCARD = "*";
 
-    public static List<LogSource> resolveSources(String[] paths) throws IOException {
+    public static List<LogSource> resolveSources(String[] paths) throws UserInputException {
         List<LogSource> sources = new ArrayList<>();
 
         for (String pathStr : paths) {
-            if (isUrl(pathStr)) {
-                logger.info("Найден URL источник: {}", pathStr);
-                sources.add(new RemoteLogSource(pathStr));
-            } else {
-                logger.info("Найден Local источник: {}", pathStr);
-                sources.addAll(resolveLocalPath(pathStr));
+            try {
+                if (isUrl(pathStr)) {
+                    logger.info("Найден URL источник: {}", pathStr);
+                    sources.add(new RemoteLogSource(pathStr));
+                } else {
+                    logger.info("Найден Local источник: {}", pathStr);
+                    sources.addAll(resolveLocalPath(pathStr));
+                }
+            } catch (IOException e) {
+                throw new UserInputException("Ошибка источника: " + pathStr, e);
             }
         }
 

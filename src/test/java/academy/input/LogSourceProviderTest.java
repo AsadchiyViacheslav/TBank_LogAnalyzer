@@ -2,6 +2,7 @@ package academy.input;
 
 import static org.assertj.core.api.Assertions.*;
 
+import academy.exception.UserInputException;
 import academy.util.TestUtils;
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class LogSourceProviderTest {
     @Test
     @DisplayName("Разрешение локального файла .log")
-    void testResolveLocalLogFile() throws IOException {
+    void testResolveLocalLogFile() throws IOException, UserInputException {
         File logFile = TestUtils.createTempLogFile();
 
         try {
@@ -29,7 +30,7 @@ class LogSourceProviderTest {
     @Test
     @DisplayName("Несуществующий файл выбрасывает исключение")
     void testNonExistentFileThrows() {
-        assertThatThrownBy(() -> resolve("/nonexistent/file.log")).isInstanceOf(IOException.class);
+        assertThatThrownBy(() -> resolve("/nonexistent/file.log")).isInstanceOf(UserInputException.class);
     }
 
     @Test
@@ -53,7 +54,7 @@ class LogSourceProviderTest {
         }
     }
 
-    private List<LogSource> resolve(String... paths) throws IOException {
+    private List<LogSource> resolve(String... paths) throws UserInputException {
         return LogSourceProvider.resolveSources(paths);
     }
 }

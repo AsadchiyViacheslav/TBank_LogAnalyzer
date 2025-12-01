@@ -24,7 +24,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LogStatisticsCollector {
+    public static final int PERCENTILE95 = 95;
     private static final Logger logger = LogManager.getLogger(LogStatisticsCollector.class);
+    public static final int TOP_LIMIT = 10;
 
     private final LocalDate fromDate;
     private final LocalDate toDate;
@@ -57,10 +59,6 @@ public class LogStatisticsCollector {
         protocols.add(entry.protocol());
     }
 
-    private boolean isInDateRange(LocalDate date) {
-        return DateUtils.isInRange(date, fromDate, toDate);
-    }
-
     public LogAnalysisResult buildResult(List<LogSource> sources) {
         List<String> fileNames = sources.stream().map(LogSource::getDescription).collect(Collectors.toList());
 
@@ -76,6 +74,10 @@ public class LogStatisticsCollector {
                 fileNames, totalRequests, sizeStats, topResources, responseCodeStats, dailyStats, uniqueProtocols);
     }
 
+    private boolean isInDateRange(LocalDate date) {
+        return DateUtils.isInRange(date, fromDate, toDate);
+    }
+
     private ResponseSizeStats calculateResponseSizeStats() {
         if (responseSizes.isEmpty()) {
             logger.warn("Размеры ответов не зафиксированы");
@@ -87,7 +89,7 @@ public class LogStatisticsCollector {
                 responseSizes.stream().mapToLong(Long::longValue).average().orElse(0);
 
         long max = responseSizes.getLast();
-        double p95 = calculatePercentile(95);
+        double p95 = calculatePercentile(PERCENTILE95);
 
         logger.debug("Рассчитанная статистика по размеру ответов: average={}, max={}, p95={}", average, max, p95);
 
@@ -116,7 +118,7 @@ public class LogStatisticsCollector {
     private List<ResourceStat> getTopResources() {
         return resourceCounts.entrySet().stream()
                 .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
-                .limit(10)
+                .limit(TOP_LIMIT)
                 .map(e -> new ResourceStat(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
     }

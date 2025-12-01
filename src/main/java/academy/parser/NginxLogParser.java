@@ -4,6 +4,7 @@ import academy.model.NginxLogEntry;
 import academy.stats.LogStatisticsCollector;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -60,7 +61,7 @@ public class NginxLogParser {
             + "$");
 
     private static final DateTimeFormatter DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("d/MMM/yyyy:HH:mm:ss Z", java.util.Locale.ENGLISH);
+            DateTimeFormatter.ofPattern("d/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
 
     public static void parseStream(Stream<String> lines, LogStatisticsCollector collector) {
         lines.forEach(line -> parseLine(line, collector));
@@ -74,16 +75,16 @@ public class NginxLogParser {
                 return;
             }
 
-            String remoteAddr = matcher.group(1);
-            NginxLogEntry entry = getNginxLogEntry(matcher, remoteAddr);
-
+            NginxLogEntry entry = getNginxLogEntry(matcher);
             collector.addEntry(entry);
+
         } catch (Exception e) {
             logger.warn("Ошибка парсинга строки: {}", line, e);
         }
     }
 
-    private static NginxLogEntry getNginxLogEntry(Matcher matcher, String remoteAddr) {
+    private static NginxLogEntry getNginxLogEntry(Matcher matcher) {
+        String remoteAddr = matcher.group(1);
         String dateStr = matcher.group(3);
         String method = matcher.group(4);
         String resource = matcher.group(5);

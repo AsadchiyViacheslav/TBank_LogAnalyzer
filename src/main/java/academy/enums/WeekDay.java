@@ -1,5 +1,6 @@
 package academy.enums;
 
+import java.time.DayOfWeek;
 import lombok.Getter;
 
 @Getter
@@ -18,7 +19,7 @@ public enum WeekDay {
         this.displayName = displayName;
     }
 
-    public static WeekDay fromJavaDay(java.time.DayOfWeek dayOfWeek) {
+    public static WeekDay fromJavaDay(DayOfWeek dayOfWeek) {
         return switch (dayOfWeek) {
             case MONDAY -> MONDAY;
             case TUESDAY -> TUESDAY;

@@ -1,7 +1,7 @@
 package academy.format;
 
+import academy.enums.HttpStatusName;
 import academy.model.LogAnalysisResult;
-import academy.util.HttpStatusNames;
 import java.time.LocalDate;
 
 public abstract class BaseReportFormatter implements ReportFormatter {
@@ -11,7 +11,7 @@ public abstract class BaseReportFormatter implements ReportFormatter {
     }
 
     protected String getHttpStatusName(int code) {
-        return HttpStatusNames.getName(code);
+        return HttpStatusName.fromCode(code).getName();
     }
 
     protected LocalDate getMinDate(LogAnalysisResult result) {

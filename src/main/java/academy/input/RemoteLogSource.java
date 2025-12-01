@@ -1,5 +1,6 @@
 package academy.input;
 
+import academy.exception.UserInputException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,12 +32,12 @@ public class RemoteLogSource implements LogSource {
      */
     @Override
     @SuppressFBWarnings("OS_OPEN_STREAM")
-    public Stream<String> getLineStream() throws IOException {
+    public Stream<String> getLineStream() throws IOException, UserInputException {
         URI uri;
         try {
             uri = new URI(url);
         } catch (URISyntaxException e) {
-            throw new IOException("Невалидный URL: " + url, e);
+            throw new UserInputException("Невалидный URL: " + url, e);
         }
 
         HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
@@ -48,11 +49,11 @@ public class RemoteLogSource implements LogSource {
         int responseCode = conn.getResponseCode();
         if (responseCode == 404) {
             conn.disconnect();
-            throw new IOException("Удалённый файл не найден (404): " + url);
+            throw new UserInputException("Удалённый файл не найден (404): " + url);
         }
-        if (responseCode != 200) {
+        if (responseCode < 200 || responseCode >= 300) {
             conn.disconnect();
-            throw new IOException("Не удалось получить удалённый файл. Код: " + responseCode);
+            throw new UserInputException("Не удалось получить удалённый файл. Код: " + responseCode);
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));

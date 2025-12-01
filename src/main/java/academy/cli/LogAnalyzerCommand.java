@@ -2,6 +2,7 @@ package academy.cli;
 
 import academy.cli.converter.ReportFileTypeConverter;
 import academy.enums.ReportFileType;
+import academy.exception.UserInputException;
 import academy.format.ReportFormatter;
 import academy.format.factory.FormatterFactory;
 import academy.input.LogSourceProvider;
@@ -73,7 +74,7 @@ public class LogAnalyzerCommand implements Callable<Integer> {
 
             var logSources = LogSourceProvider.resolveSources(paths);
             if (logSources.isEmpty()) {
-                throw new IOException("Файлов с логами не найдено");
+                throw new UserInputException("Файлов с логами не найдено: " + String.join(", ", paths));
             }
 
             var collector = new LogStatisticsCollector(fromDate, toDate);
@@ -93,9 +94,12 @@ public class LogAnalyzerCommand implements Callable<Integer> {
         } catch (IllegalArgumentException e) {
             logger.error("Ошибка валидации: {}", e.getMessage());
             return 2;
-        } catch (IOException e) {
+        } catch (UserInputException e) {
             logger.error("Ошибка ввода: {}", e.getMessage());
             return 2;
+        } catch (IOException e) {
+            logger.error("Ошибка записи: {}", e.getMessage());
+            return 1;
         } catch (Exception e) {
             logger.error("Неизвестная ошибка", e);
             return 1;

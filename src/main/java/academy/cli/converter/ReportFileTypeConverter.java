@@ -7,10 +7,6 @@ public class ReportFileTypeConverter implements ITypeConverter<ReportFileType> {
 
     @Override
     public ReportFileType convert(String value) throws Exception {
-        try {
-            return ReportFileType.fromString(value);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Неподдерживаемый формат: " + value, e);
-        }
+        return ReportFileType.fromString(value);
     }
 }
